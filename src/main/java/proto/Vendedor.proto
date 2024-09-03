@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+// Definição da entidade Vendedor
+message Vendedor {
+    int32 id = 1;
+    string nome = 2;
+    string cpf = 3;
+    string email = 4;
+    string telefone = 5;
+    bool status = 6;
+    int32 comissao = 7; // Representa o percentual ganho por venda
+    int32 meta_vendas = 8; // Meta de vendas em unidades
+    int32 vendas = 9; // Quantidade de vendas bem sucedidas
+    string area_atuacao = 10; // Área de atuação
+}
+
+// Definição dos argumentos para operações específicas
+message AdicionarVendedorArgs {
+    Vendedor vendedor = 1;
+}
+
+message EditarVendedorArgs {
+	int32 id = 1;
+    Vendedor vendedor = 2;
+}
+
+message RemoverVendedorArgs {
+    int32 id = 1;
+}
+
+message QuantidadeVendasPorAreaAtuacaoArgs {
+    string area_atuacao = 1;
+}
+
+message DesempenhoVendedorArgs {
+    int32 id = 1;
+}
+
+// Mensagens de resposta para operações específicas
+message GenericResponse {
+    int32 codigo = 1;   // Código de status: 200 para sucesso, 400 para erro, etc.
+    string mensagem = 2;
+}
+
+message QuantidadeVendasAbsolutasResponse {
+    int32 quantidade = 1;
+}
+
+message QuantidadeVendasPorAreaAtuacaoResponse {
+    int32 quantidade = 1;
+}
+
+message DesempenhoVendedorResponse {
+    float desempenho = 1;
+}
+
+message ListarVendedoresResponse {
+    repeated Vendedor vendedores = 1;
+}
+
+// Definição da mensagem genérica para comunicação
+message Message {
+    int32 type = 1;             // 1: Requisição, 2: Resposta
+    int32 id = 2;               // Identificador da mensagem
+    string obfReference = 3;    // Referência ao objeto ou serviço
+    string methodId = 4;        // Identificador do método a ser invocado
+    bytes arguments = 5;        // Argumentos serializados da operação
+}
