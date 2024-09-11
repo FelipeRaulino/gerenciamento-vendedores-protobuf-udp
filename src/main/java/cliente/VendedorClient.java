@@ -29,7 +29,8 @@ public class VendedorClient {
 				System.out.println("Bem-Vindo ao SGV. Escolha uma de nossos serviços: ");
 				System.out.println("1 - Adicionar novo vendedor");
 				System.out.println("2 - Listar vendedores");
-				System.out.println("3 - Ver quantidade de vendas absolutas");
+				System.out.println("3 - Remover vendedor");
+				System.out.println("4 - Ver quantidade de vendas absolutas");
 				
 				int escolha = Integer.parseInt(stdin.readLine());
 				
@@ -55,10 +56,15 @@ public class VendedorClient {
 						break;
 					
 					case 3:
+						System.out.println("Informe o id: ");
+						int id = Integer.parseInt(stdin.readLine());
+						System.out.println(proxy.removerVendedor(id));
+						break;
+						
+					case 4:
 						int vendasTotal = proxy.quantidadeVendasAbsolutas();
 						System.out.println("Quantidade total de vendas: " + vendasTotal);
 						break;
-						
 					default:
 						option = false;
 						break;

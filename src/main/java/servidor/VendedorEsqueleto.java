@@ -7,7 +7,8 @@ import proto.VendedorOuterClass.Vendedor;
 import proto.VendedorOuterClass.AdicionarVendedorArgs;
 import proto.VendedorOuterClass.GenericResponse;
 import proto.VendedorOuterClass.ListarVendedoresResponse;
-import proto.VendedorOuterClass.QuantidadeVendasAbsolutasResponse;;
+import proto.VendedorOuterClass.QuantidadeVendasAbsolutasResponse;
+import proto.VendedorOuterClass.RemoverVendedorArgs;
 
 public class VendedorEsqueleto {
 	
@@ -25,6 +26,17 @@ public class VendedorEsqueleto {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return GenericResponse.newBuilder().setMensagem("Erro ao adicionar vendedor").build().toByteArray();
+		}
+	}
+
+	public byte[] removerVendedor(ByteString args){
+		try {
+			RemoverVendedorArgs requisicao = RemoverVendedorArgs.parseFrom(args);
+			GenericResponse resposta = servente.removerVendedor(requisicao.getId());
+			return resposta.toByteArray();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return GenericResponse.newBuilder().setMensagem("Erro ao remover vendedor").build().toByteArray();
 		}
 	}
 	

@@ -20,6 +20,9 @@ public class VendedorDespachante {
 				
 				case "quantidadeVendasAbsolutas":
 					return esqueleto.quantidadeVendasAbsolutas();
+				
+				case "removerVendedor":
+					return esqueleto.removerVendedor(request.getArguments());
 	
 				default:
 					return null;

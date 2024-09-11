@@ -1,6 +1,7 @@
 package servidor;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,6 +9,7 @@ import java.util.regex.Pattern;
 import exceptions.CPFInvalidoException;
 import exceptions.DadosInvalidosException;
 import exceptions.EmailInvalidoException;
+import exceptions.VendedorNaoEncontradoException;
 import proto.VendedorOuterClass.Vendedor;
 import proto.VendedorOuterClass.GenericResponse;
 
@@ -46,6 +48,37 @@ public class VendedorServente {
 		}
 	}
 
+	public GenericResponse removerVendedor(int id){
+		try {	
+			for (Vendedor vendedor : vendedores) {
+				if (vendedor.getId() != id){
+					throw new VendedorNaoEncontradoException("Vendedor com id " + id + " não encontrado!");
+				}
+			}
+			
+		
+			Iterator<Vendedor> iterator = vendedores.iterator();
+			
+			while (iterator.hasNext()) {
+				Vendedor vendedor = iterator.next();
+				if (vendedor.getId() == id){
+					iterator.remove();
+				}
+			}
+			
+			System.out.println("Tamanho da lista: " + vendedores.size());;
+
+
+			return GenericResponse.newBuilder()
+					.setCodigo(200)
+					.setMensagem("Vendedor removido com sucesso!")
+					.build();
+
+		} catch (VendedorNaoEncontradoException e) {
+			return empacotaErro(e);
+		}
+	}
+
 	public List<Vendedor> listarVendedores() {
 		return new ArrayList<>(vendedores);
 	}
@@ -76,7 +109,12 @@ public class VendedorServente {
 					.setCodigo(422)
 					.setMensagem(e.getMessage())
 					.build();
-		} else {
+		} else if (e instanceof VendedorNaoEncontradoException) {
+			return GenericResponse.newBuilder()
+					.setCodigo(404)
+					.setMensagem(e.getMessage())
+					.build();
+		}else {
 			return GenericResponse.newBuilder()
 					.setCodigo(500)
 					.setMensagem(e.getMessage())

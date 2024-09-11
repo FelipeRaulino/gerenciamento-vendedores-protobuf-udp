@@ -9,9 +9,11 @@ import exceptions.CPFInvalidoException;
 import exceptions.DadosInvalidosException;
 import exceptions.EmailInvalidoException;
 import exceptions.FalhaNaConexaoException;
+import exceptions.VendedorNaoEncontradoException;
 import proto.VendedorOuterClass.Message;
 import proto.VendedorOuterClass.QuantidadeVendasAbsolutasArgs;
 import proto.VendedorOuterClass.QuantidadeVendasAbsolutasResponse;
+import proto.VendedorOuterClass.RemoverVendedorArgs;
 import proto.VendedorOuterClass.Vendedor;
 import proto.VendedorOuterClass.AdicionarVendedorArgs;
 import proto.VendedorOuterClass.ListarVendedoresArgs;
@@ -65,6 +67,25 @@ public class VendedorProxy {
 	    }
 	}
 
+	public String removerVendedor(int id) throws Exception {
+		RemoverVendedorArgs args = RemoverVendedorArgs.newBuilder().setId(id).build();
+
+		byte[] responseBytes = doOperation("VendedorService", "removerVendedor", args.toByteArray());
+
+		try {
+			GenericResponse response = GenericResponse.parseFrom(responseBytes);
+
+			switch(response.getCodigo()){
+				case 404: 
+					throw new VendedorNaoEncontradoException(response.getMensagem());
+			}
+
+			return response.getMensagem();
+
+		} catch (Exception e) {
+			throw new FalhaNaConexaoException("Erro ao interpretar a resposta do servidor.");
+		}
+	}
 	
 	public List<Vendedor> listarVendedores(){
 		try {
