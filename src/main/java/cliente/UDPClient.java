@@ -27,7 +27,7 @@ public class UDPClient {
 	}
 	
 	public byte[] getReply() throws Exception {
-	    byte[] buffer = new byte[4096];
+	    byte[] buffer = new byte[1024];
 	    DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 	    socket.receive(reply);
 	    

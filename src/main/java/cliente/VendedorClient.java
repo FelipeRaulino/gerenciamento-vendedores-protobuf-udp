@@ -75,11 +75,13 @@ public class VendedorClient {
 		String nome, cpf, email, telefone, areaAtuacao;
 		int comissao, metaVendas, vendas;
 		boolean status;
+		
+		List<Vendedor> vendedores = proxy.listarVendedores();
 
 		System.out.println("Adicionar novo vendedor:");
 		System.out.print("Nome: ");
 		nome = stdin.readLine();
-		System.out.print("CPF: ");
+		System.out.print("CPF (XXX.XXX.XXX-XX): ");
 		cpf = stdin.readLine();
 		System.out.print("Email: ");
 		email = stdin.readLine();
@@ -97,6 +99,7 @@ public class VendedorClient {
 		areaAtuacao = stdin.readLine();
 		
 		Vendedor vendedor = Vendedor.newBuilder()
+				.setId(vendedores.size() + 1)
                 .setNome(nome)
                 .setCpf(cpf)
                 .setEmail(email)

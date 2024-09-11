@@ -5,7 +5,9 @@ import java.util.List;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import exceptions.CPFInvalidoException;
 import exceptions.DadosInvalidosException;
+import exceptions.EmailInvalidoException;
 import exceptions.FalhaNaConexaoException;
 import proto.VendedorOuterClass.Message;
 import proto.VendedorOuterClass.QuantidadeVendasAbsolutasArgs;
@@ -46,6 +48,13 @@ public class VendedorProxy {
 
 	            case 400:
 	                throw new DadosInvalidosException(response.getMensagem());
+	            
+	            case 422:
+	            	if (response.getMensagem().contains("email")) {
+	            		throw new EmailInvalidoException(response.getMensagem());
+	            	} else if (response.getMensagem().contains("cpf")) {
+	            		throw new CPFInvalidoException(response.getMensagem());
+	            	}
 
 	            default:
 	                throw new FalhaNaConexaoException("Erro desconhecido: " + response.getMensagem());
