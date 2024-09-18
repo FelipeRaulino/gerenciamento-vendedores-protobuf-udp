@@ -18,11 +18,21 @@ public class VendedorDespachante {
 				case "listarVendedores":
 					return esqueleto.listarVendedores();
 				
-				case "quantidadeVendasAbsolutas":
-					return esqueleto.quantidadeVendasAbsolutas();
+				case "editarVendedor":
+					return esqueleto.editarVendedor(request.getArguments());
 				
 				case "removerVendedor":
 					return esqueleto.removerVendedor(request.getArguments());
+					
+				case "quantidadeVendasAbsolutas":
+					return esqueleto.quantidadeVendasAbsolutas();
+					
+				case "quantidadeVendasPorAreaAtuacao":
+					return esqueleto.quantidadeVendasPorAreaAtuacao(request.getArguments());
+					
+				case "desempenhoVendedor":
+					return esqueleto.desempenhoVendedor(request.getArguments());
+				
 	
 				default:
 					return null;

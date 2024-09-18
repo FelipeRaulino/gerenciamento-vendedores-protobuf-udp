@@ -13,9 +13,14 @@ import exceptions.VendedorNaoEncontradoException;
 import proto.VendedorOuterClass.Message;
 import proto.VendedorOuterClass.QuantidadeVendasAbsolutasArgs;
 import proto.VendedorOuterClass.QuantidadeVendasAbsolutasResponse;
+import proto.VendedorOuterClass.QuantidadeVendasPorAreaAtuacaoArgs;
+import proto.VendedorOuterClass.QuantidadeVendasPorAreaAtuacaoResponse;
 import proto.VendedorOuterClass.RemoverVendedorArgs;
 import proto.VendedorOuterClass.Vendedor;
 import proto.VendedorOuterClass.AdicionarVendedorArgs;
+import proto.VendedorOuterClass.DesempenhoVendedorArgs;
+import proto.VendedorOuterClass.DesempenhoVendedorResponse;
+import proto.VendedorOuterClass.EditarVendedorArgs;
 import proto.VendedorOuterClass.ListarVendedoresArgs;
 import proto.VendedorOuterClass.GenericResponse;
 import proto.VendedorOuterClass.ListarVendedoresResponse;;
@@ -46,7 +51,7 @@ public class VendedorProxy {
 	        // Verifica o código de status e lança a exceção apropriada
 	        switch (response.getCodigo()) {
 	            case 200:
-	                return response.getMensagem(); // Sucesso
+	                return response.getMensagem();
 
 	            case 400:
 	                throw new DadosInvalidosException(response.getMensagem());
@@ -62,9 +67,46 @@ public class VendedorProxy {
 	                throw new FalhaNaConexaoException("Erro desconhecido: " + response.getMensagem());
 	        }
 	    } catch (InvalidProtocolBufferException e) {
-	        // Caso não consiga interpretar a resposta, lança uma exceção de falha na conexão
 	        throw new FalhaNaConexaoException("Erro ao interpretar a resposta do servidor.");
 	    }
+	}
+	
+	public String editarVendedor(int id, Vendedor vendedor) throws Exception {
+		EditarVendedorArgs args = EditarVendedorArgs.newBuilder()
+				.setId(id)
+				.setVendedor(vendedor)
+				.build();
+		
+		byte[] responseBytes = doOperation("VendedorService", "editarVendedor", args.toByteArray());
+		
+		try {
+			GenericResponse response = GenericResponse.parseFrom(responseBytes);
+			
+			switch (response.getCodigo()) {
+				case 200:
+	                return response.getMensagem();
+	                
+				case 400:
+	                throw new DadosInvalidosException(response.getMensagem());
+	            
+				case 404:
+					throw new VendedorNaoEncontradoException(response.getMensagem());
+				
+				case 422:
+	            	if (response.getMensagem().contains("email")) {
+	            		throw new EmailInvalidoException(response.getMensagem());
+	            	} else if (response.getMensagem().contains("cpf")) {
+	            		throw new CPFInvalidoException(response.getMensagem());
+	            	}
+
+	
+				default:
+					throw new FalhaNaConexaoException("Erro desconhecido: " + response.getMensagem());
+			}
+			
+		} catch (InvalidProtocolBufferException e) {
+			throw new FalhaNaConexaoException("Erro ao interpretar a resposta do servidor.");
+		}
 	}
 
 	public String removerVendedor(int id) throws Exception {
@@ -76,13 +118,17 @@ public class VendedorProxy {
 			GenericResponse response = GenericResponse.parseFrom(responseBytes);
 
 			switch(response.getCodigo()){
+				case 200:
+					return response.getMensagem();
+					
 				case 404: 
 					throw new VendedorNaoEncontradoException(response.getMensagem());
+					
+				default:
+					throw new FalhaNaConexaoException("Erro desconhecido: " + response.getMensagem());
 			}
 
-			return response.getMensagem();
-
-		} catch (Exception e) {
+		} catch (InvalidProtocolBufferException e) {
 			throw new FalhaNaConexaoException("Erro ao interpretar a resposta do servidor.");
 		}
 	}
@@ -115,6 +161,50 @@ public class VendedorProxy {
 			e.printStackTrace();
 			return -1;
 		}
+	}
+	
+	public int quantidadeVendasPorAreaAtuacao(String areaAtuacao) {
+		try {
+			QuantidadeVendasPorAreaAtuacaoArgs reqArgs = QuantidadeVendasPorAreaAtuacaoArgs.newBuilder()
+					.setAreaAtuacao(areaAtuacao)
+					.build();
+			
+			byte[] responseBytes = doOperation("VendedorService", "quantidadeVendasPorAreaAtuacao", reqArgs.toByteArray());
+			
+			QuantidadeVendasPorAreaAtuacaoResponse response = QuantidadeVendasPorAreaAtuacaoResponse.parseFrom(responseBytes);
+			
+			return response.getQuantidade();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
+	public int desempenhoVendedor(int id) throws Exception {
+			DesempenhoVendedorArgs reqArgs = DesempenhoVendedorArgs.newBuilder()
+					.setId(id)
+					.build();
+			
+			byte[] responseBytes = doOperation("VendedorService", "desempenhoVendedor", reqArgs.toByteArray());
+			
+			try {
+				DesempenhoVendedorResponse response = DesempenhoVendedorResponse.parseFrom(responseBytes);
+				
+				switch (response.getCodigo()) {
+					case 200:
+		                return response.getDesempenho();
+		            
+					case 404:
+						throw new VendedorNaoEncontradoException(response.getMensagem());
+		
+					default:
+						throw new FalhaNaConexaoException("Erro desconhecido: " + response.getMensagem());
+				}
+				
+			} catch (InvalidProtocolBufferException e) {
+				throw new FalhaNaConexaoException("Erro ao interpretar a resposta do servidor.");
+			}
+			
 	}
 	
 	public byte[] doOperation(String objectRef, String method, byte[] args) {

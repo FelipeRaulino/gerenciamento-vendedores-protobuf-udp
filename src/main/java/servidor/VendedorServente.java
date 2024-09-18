@@ -11,6 +11,7 @@ import exceptions.DadosInvalidosException;
 import exceptions.EmailInvalidoException;
 import exceptions.VendedorNaoEncontradoException;
 import proto.VendedorOuterClass.Vendedor;
+import proto.VendedorOuterClass.DesempenhoVendedorResponse;
 import proto.VendedorOuterClass.GenericResponse;
 
 public class VendedorServente {
@@ -18,6 +19,8 @@ public class VendedorServente {
 	private static List<Vendedor> vendedores = new ArrayList<Vendedor>();
 	
 	private final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}";
+	
+	//Métodos da aplicação
 
 	public GenericResponse adicionarVendedor(Vendedor vendedor) {
 		try {
@@ -33,9 +36,9 @@ public class VendedorServente {
 				throw new CPFInvalidoException("Por favor, forneça um cpf válido");
 			}
 			
-			if (vendedorExistente(vendedor.getEmail())) {
-				
-			}
+//			if (vendedorExistente(vendedor.getEmail())) {
+//				
+//			}
 			
 			vendedores.add(vendedor);
 
@@ -47,13 +50,70 @@ public class VendedorServente {
 			return empacotaErro(e);
 		}
 	}
-
+	
+	public List<Vendedor> listarVendedores() {
+		return new ArrayList<>(vendedores);
+	}
+	
+	public GenericResponse editarVendedor(int id, Vendedor vendedor) {
+		try {
+			Vendedor vendedorExistente = getVendedorPorId(id);
+			
+			if (vendedorExistente == null) {
+				throw new VendedorNaoEncontradoException("Vendedor de id: " + id + " não encontrado!");
+			}
+			
+			if (campoVazio(vendedor)) {
+				throw new DadosInvalidosException("Todos os campos precisam ser preenchidos!");
+			}
+			
+			if (!emailValido(vendedor.getEmail())) {
+				throw new EmailInvalidoException("Por favor, forneça um email válido");
+			}
+			
+			if (!validarCPF(vendedor.getCpf())) {
+				throw new CPFInvalidoException("Por favor, forneça um cpf válido");
+			}
+			
+			for (int i = 0; i < vendedores.size(); i++) {
+	            if (vendedores.get(i).getId() == id) {
+	                vendedores.set(i, vendedor.toBuilder()
+	                    .setId(id)
+	                    .setNome(vendedor.getNome())
+	                    .setEmail(vendedor.getEmail())
+	                    .setTelefone(vendedor.getTelefone())
+	                    .setStatus(vendedor.getStatus())
+	                    .setComissao(vendedor.getComissao())
+	                    .setMetaVendas(vendedor.getMetaVendas())
+	                    .setVendas(vendedor.getVendas())
+	                    .setAreaAtuacao(vendedor.getAreaAtuacao())
+	                    .build());
+	                break;
+	            }
+	        }
+			
+			return GenericResponse.newBuilder()
+					.setCodigo(200)
+					.setMensagem("Vendedor editado com sucesso!")
+					.build();
+			
+		} catch (DadosInvalidosException | VendedorNaoEncontradoException | EmailInvalidoException | CPFInvalidoException e) {
+			return empacotaErro(e);
+		}
+	}
+	
 	public GenericResponse removerVendedor(int id){
-		try {	
+		try {
+			Boolean hasVendedor = false;
+			
 			for (Vendedor vendedor : vendedores) {
-				if (vendedor.getId() != id){
-					throw new VendedorNaoEncontradoException("Vendedor com id " + id + " não encontrado!");
+				if (vendedor.getId() == id){
+					hasVendedor = true;
 				}
+			}
+			
+			if (hasVendedor == false) {
+				throw new VendedorNaoEncontradoException("Vendedor de id: " + id + " não encontrado!");
 			}
 			
 		
@@ -65,9 +125,6 @@ public class VendedorServente {
 					iterator.remove();
 				}
 			}
-			
-			System.out.println("Tamanho da lista: " + vendedores.size());;
-
 
 			return GenericResponse.newBuilder()
 					.setCodigo(200)
@@ -77,10 +134,6 @@ public class VendedorServente {
 		} catch (VendedorNaoEncontradoException e) {
 			return empacotaErro(e);
 		}
-	}
-
-	public List<Vendedor> listarVendedores() {
-		return new ArrayList<>(vendedores);
 	}
 
 	public int quantidadeVendasAbsolutas() {
@@ -93,7 +146,49 @@ public class VendedorServente {
 		return totalVendas;
 	}
 
-	private GenericResponse empacotaErro(Exception e) {
+	public int quantidadeVendasPorAreaAtuacao(String areaAtuacao) {
+		int total = 0;
+		
+		System.out.println(areaAtuacao);
+		
+		for (Vendedor vendedor : vendedores) {
+			if (vendedor.getAreaAtuacao().equalsIgnoreCase(areaAtuacao)) {
+				total += vendedor.getVendas();
+			}
+		}
+		
+		return total;
+	}
+	
+	public DesempenhoVendedorResponse desempenhoVendedor(int id) {
+		try {
+			Vendedor vendedorExistente = getVendedorPorId(id);
+			
+			if (vendedorExistente == null) {
+				throw new VendedorNaoEncontradoException("Vendedor de id: " + id + " não encontrado!");
+			}
+			
+			int vendas = vendedorExistente.getVendas();
+	        int meta = vendedorExistente.getMetaVendas();
+	        int desempenho = (int) ((vendas / (double) meta) * 100);
+
+	        return DesempenhoVendedorResponse.newBuilder()
+	                .setCodigo(200)
+	                .setMensagem("Desempenho calculado com sucesso!")
+	                .setDesempenho(desempenho)
+	                .build();
+
+		    } catch (VendedorNaoEncontradoException e) {
+		        return DesempenhoVendedorResponse.newBuilder()
+		                .setCodigo(404)
+		                .setMensagem(e.getMessage())
+		                .setDesempenho(-1)
+		                .build();
+		    }
+	}
+	
+	// Método para tratamento de erros
+ 	private GenericResponse empacotaErro(Exception e) {
 		if (e instanceof DadosInvalidosException) {
 			return GenericResponse.newBuilder()
 					.setCodigo(400)
@@ -122,6 +217,8 @@ public class VendedorServente {
 		}
 	}
 
+	
+	// Métodos auxiliadores
 	private boolean campoVazio(Vendedor vendedor) {
 		if (vendedor.getNome() == null || vendedor.getNome().isEmpty() || vendedor.getCpf() == null
 				|| vendedor.getCpf().isEmpty() || vendedor.getEmail() == null || vendedor.getEmail().isEmpty()
@@ -176,7 +273,7 @@ public class VendedorServente {
         return (resto == 10 || resto == 11) ? 0 : resto;
     }
 	
-    private boolean vendedorExistente(String email) {
+    private boolean vendedorExistenteByEmail(String email) {
     	for (Vendedor vendedor : vendedores) {
 			if (vendedor.getEmail() == email) {
 				return true;
@@ -185,5 +282,16 @@ public class VendedorServente {
     	
     	return false;
     }
+    
+    private Vendedor getVendedorPorId(int id) {
+    	for (Vendedor vendedor : vendedores) {
+			if (vendedor.getId() == id) {
+				return vendedor;
+			}
+		}
+    	
+    	return null;
+    }
+    
     
 }

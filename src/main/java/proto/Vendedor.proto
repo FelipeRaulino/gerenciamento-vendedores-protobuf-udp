@@ -55,7 +55,9 @@ message QuantidadeVendasPorAreaAtuacaoResponse {
 }
 
 message DesempenhoVendedorResponse {
-    float desempenho = 1;
+    int32 codigo = 1;
+    string mensagem = 2;
+    int32 desempenho = 3;
 }
 
 message ListarVendedoresResponse {

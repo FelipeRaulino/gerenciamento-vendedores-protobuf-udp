@@ -31,9 +31,7 @@ public class UDPClient {
 	    DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 	    socket.receive(reply);
 	    
-	    // Verifique o tamanho da mensagem recebida
-	    System.out.println("Bytes recebidos: " + reply.getLength());
-	    return Arrays.copyOf(reply.getData(), reply.getLength()); // Retorne apenas os bytes relevantes
+	    return Arrays.copyOf(reply.getData(), reply.getLength());
 	}
 	
 	public void finaliza() {

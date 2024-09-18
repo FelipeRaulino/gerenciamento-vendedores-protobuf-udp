@@ -6383,10 +6383,28 @@ public final class VendedorOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>float desempenho = 1;</code>
+     * <code>int32 codigo = 1;</code>
+     * @return The codigo.
+     */
+    int getCodigo();
+
+    /**
+     * <code>string mensagem = 2;</code>
+     * @return The mensagem.
+     */
+    java.lang.String getMensagem();
+    /**
+     * <code>string mensagem = 2;</code>
+     * @return The bytes for mensagem.
+     */
+    com.google.protobuf.ByteString
+        getMensagemBytes();
+
+    /**
+     * <code>int32 desempenho = 3;</code>
      * @return The desempenho.
      */
-    float getDesempenho();
+    int getDesempenho();
   }
   /**
    * Protobuf type {@code DesempenhoVendedorResponse}
@@ -6410,6 +6428,7 @@ public final class VendedorOuterClass {
       super(builder);
     }
     private DesempenhoVendedorResponse() {
+      mensagem_ = "";
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -6425,14 +6444,64 @@ public final class VendedorOuterClass {
               VendedorOuterClass.DesempenhoVendedorResponse.class, VendedorOuterClass.DesempenhoVendedorResponse.Builder.class);
     }
 
-    public static final int DESEMPENHO_FIELD_NUMBER = 1;
-    private float desempenho_ = 0F;
+    public static final int CODIGO_FIELD_NUMBER = 1;
+    private int codigo_ = 0;
     /**
-     * <code>float desempenho = 1;</code>
+     * <code>int32 codigo = 1;</code>
+     * @return The codigo.
+     */
+    @java.lang.Override
+    public int getCodigo() {
+      return codigo_;
+    }
+
+    public static final int MENSAGEM_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object mensagem_ = "";
+    /**
+     * <code>string mensagem = 2;</code>
+     * @return The mensagem.
+     */
+    @java.lang.Override
+    public java.lang.String getMensagem() {
+      java.lang.Object ref = mensagem_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        mensagem_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string mensagem = 2;</code>
+     * @return The bytes for mensagem.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getMensagemBytes() {
+      java.lang.Object ref = mensagem_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        mensagem_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DESEMPENHO_FIELD_NUMBER = 3;
+    private int desempenho_ = 0;
+    /**
+     * <code>int32 desempenho = 3;</code>
      * @return The desempenho.
      */
     @java.lang.Override
-    public float getDesempenho() {
+    public int getDesempenho() {
       return desempenho_;
     }
 
@@ -6450,8 +6519,14 @@ public final class VendedorOuterClass {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (java.lang.Float.floatToRawIntBits(desempenho_) != 0) {
-        output.writeFloat(1, desempenho_);
+      if (codigo_ != 0) {
+        output.writeInt32(1, codigo_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(mensagem_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, mensagem_);
+      }
+      if (desempenho_ != 0) {
+        output.writeInt32(3, desempenho_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -6462,9 +6537,16 @@ public final class VendedorOuterClass {
       if (size != -1) return size;
 
       size = 0;
-      if (java.lang.Float.floatToRawIntBits(desempenho_) != 0) {
+      if (codigo_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(1, desempenho_);
+          .computeInt32Size(1, codigo_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(mensagem_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, mensagem_);
+      }
+      if (desempenho_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, desempenho_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -6481,9 +6563,12 @@ public final class VendedorOuterClass {
       }
       VendedorOuterClass.DesempenhoVendedorResponse other = (VendedorOuterClass.DesempenhoVendedorResponse) obj;
 
-      if (java.lang.Float.floatToIntBits(getDesempenho())
-          != java.lang.Float.floatToIntBits(
-              other.getDesempenho())) return false;
+      if (getCodigo()
+          != other.getCodigo()) return false;
+      if (!getMensagem()
+          .equals(other.getMensagem())) return false;
+      if (getDesempenho()
+          != other.getDesempenho()) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -6495,9 +6580,12 @@ public final class VendedorOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CODIGO_FIELD_NUMBER;
+      hash = (53 * hash) + getCodigo();
+      hash = (37 * hash) + MENSAGEM_FIELD_NUMBER;
+      hash = (53 * hash) + getMensagem().hashCode();
       hash = (37 * hash) + DESEMPENHO_FIELD_NUMBER;
-      hash = (53 * hash) + java.lang.Float.floatToIntBits(
-          getDesempenho());
+      hash = (53 * hash) + getDesempenho();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -6629,7 +6717,9 @@ public final class VendedorOuterClass {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        desempenho_ = 0F;
+        codigo_ = 0;
+        mensagem_ = "";
+        desempenho_ = 0;
         return this;
       }
 
@@ -6664,6 +6754,12 @@ public final class VendedorOuterClass {
       private void buildPartial0(VendedorOuterClass.DesempenhoVendedorResponse result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.codigo_ = codigo_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.mensagem_ = mensagem_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
           result.desempenho_ = desempenho_;
         }
       }
@@ -6680,7 +6776,15 @@ public final class VendedorOuterClass {
 
       public Builder mergeFrom(VendedorOuterClass.DesempenhoVendedorResponse other) {
         if (other == VendedorOuterClass.DesempenhoVendedorResponse.getDefaultInstance()) return this;
-        if (other.getDesempenho() != 0F) {
+        if (other.getCodigo() != 0) {
+          setCodigo(other.getCodigo());
+        }
+        if (!other.getMensagem().isEmpty()) {
+          mensagem_ = other.mensagem_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (other.getDesempenho() != 0) {
           setDesempenho(other.getDesempenho());
         }
         this.mergeUnknownFields(other.getUnknownFields());
@@ -6709,11 +6813,21 @@ public final class VendedorOuterClass {
               case 0:
                 done = true;
                 break;
-              case 13: {
-                desempenho_ = input.readFloat();
+              case 8: {
+                codigo_ = input.readInt32();
                 bitField0_ |= 0x00000001;
                 break;
-              } // case 13
+              } // case 8
+              case 18: {
+                mensagem_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 24: {
+                desempenho_ = input.readInt32();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -6731,34 +6845,138 @@ public final class VendedorOuterClass {
       }
       private int bitField0_;
 
-      private float desempenho_ ;
+      private int codigo_ ;
       /**
-       * <code>float desempenho = 1;</code>
-       * @return The desempenho.
+       * <code>int32 codigo = 1;</code>
+       * @return The codigo.
        */
       @java.lang.Override
-      public float getDesempenho() {
-        return desempenho_;
+      public int getCodigo() {
+        return codigo_;
       }
       /**
-       * <code>float desempenho = 1;</code>
-       * @param value The desempenho to set.
+       * <code>int32 codigo = 1;</code>
+       * @param value The codigo to set.
        * @return This builder for chaining.
        */
-      public Builder setDesempenho(float value) {
+      public Builder setCodigo(int value) {
 
-        desempenho_ = value;
+        codigo_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <code>float desempenho = 1;</code>
+       * <code>int32 codigo = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCodigo() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        codigo_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object mensagem_ = "";
+      /**
+       * <code>string mensagem = 2;</code>
+       * @return The mensagem.
+       */
+      public java.lang.String getMensagem() {
+        java.lang.Object ref = mensagem_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          mensagem_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string mensagem = 2;</code>
+       * @return The bytes for mensagem.
+       */
+      public com.google.protobuf.ByteString
+          getMensagemBytes() {
+        java.lang.Object ref = mensagem_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          mensagem_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string mensagem = 2;</code>
+       * @param value The mensagem to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMensagem(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        mensagem_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string mensagem = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMensagem() {
+        mensagem_ = getDefaultInstance().getMensagem();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string mensagem = 2;</code>
+       * @param value The bytes for mensagem to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMensagemBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        mensagem_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private int desempenho_ ;
+      /**
+       * <code>int32 desempenho = 3;</code>
+       * @return The desempenho.
+       */
+      @java.lang.Override
+      public int getDesempenho() {
+        return desempenho_;
+      }
+      /**
+       * <code>int32 desempenho = 3;</code>
+       * @param value The desempenho to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDesempenho(int value) {
+
+        desempenho_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 desempenho = 3;</code>
        * @return This builder for chaining.
        */
       public Builder clearDesempenho() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        desempenho_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        desempenho_ = 0;
         onChanged();
         return this;
       }
@@ -11247,18 +11465,19 @@ public final class VendedorOuterClass {
       "\022\016\n\006codigo\030\001 \001(\005\022\020\n\010mensagem\030\002 \001(\t\"7\n!Qu" +
       "antidadeVendasAbsolutasResponse\022\022\n\nquant" +
       "idade\030\001 \001(\005\"<\n&QuantidadeVendasPorAreaAt" +
-      "uacaoResponse\022\022\n\nquantidade\030\001 \001(\005\"0\n\032Des" +
-      "empenhoVendedorResponse\022\022\n\ndesempenho\030\001 " +
-      "\001(\002\"9\n\030ListarVendedoresResponse\022\035\n\nvende" +
-      "dores\030\001 \003(\0132\t.Vendedor\"^\n\007Message\022\014\n\004typ" +
-      "e\030\001 \001(\005\022\n\n\002id\030\002 \001(\005\022\024\n\014obfReference\030\003 \001(" +
-      "\t\022\020\n\010methodId\030\004 \001(\t\022\021\n\targuments\030\005 \001(\014\"*" +
-      "\n\027FalhaNaConexaoException\022\017\n\007message\030\001 \001" +
-      "(\t\"-\n\032VendedorExistenteException\022\017\n\007mess" +
-      "age\030\001 \001(\t\"*\n\027DadosInvalidosException\022\017\n\007" +
-      "message\030\001 \001(\t\")\n\026EmailInvalidoException\022" +
-      "\017\n\007message\030\001 \001(\t\"\'\n\024CPFInvalidoException" +
-      "\022\017\n\007message\030\001 \001(\tb\006proto3"
+      "uacaoResponse\022\022\n\nquantidade\030\001 \001(\005\"R\n\032Des" +
+      "empenhoVendedorResponse\022\016\n\006codigo\030\001 \001(\005\022" +
+      "\020\n\010mensagem\030\002 \001(\t\022\022\n\ndesempenho\030\003 \001(\005\"9\n" +
+      "\030ListarVendedoresResponse\022\035\n\nvendedores\030" +
+      "\001 \003(\0132\t.Vendedor\"^\n\007Message\022\014\n\004type\030\001 \001(" +
+      "\005\022\n\n\002id\030\002 \001(\005\022\024\n\014obfReference\030\003 \001(\t\022\020\n\010m" +
+      "ethodId\030\004 \001(\t\022\021\n\targuments\030\005 \001(\014\"*\n\027Falh" +
+      "aNaConexaoException\022\017\n\007message\030\001 \001(\t\"-\n\032" +
+      "VendedorExistenteException\022\017\n\007message\030\001 " +
+      "\001(\t\"*\n\027DadosInvalidosException\022\017\n\007messag" +
+      "e\030\001 \001(\t\")\n\026EmailInvalidoException\022\017\n\007mes" +
+      "sage\030\001 \001(\t\"\'\n\024CPFInvalidoException\022\017\n\007me" +
+      "ssage\030\001 \001(\tb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -11335,7 +11554,7 @@ public final class VendedorOuterClass {
     internal_static_DesempenhoVendedorResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_DesempenhoVendedorResponse_descriptor,
-        new java.lang.String[] { "Desempenho", });
+        new java.lang.String[] { "Codigo", "Mensagem", "Desempenho", });
     internal_static_ListarVendedoresResponse_descriptor =
       getDescriptor().getMessageTypes().get(12);
     internal_static_ListarVendedoresResponse_fieldAccessorTable = new
