@@ -72,24 +72,3 @@ message Message {
     string methodId = 4;        // Identificador do método a ser invocado
     bytes arguments = 5;        // Argumentos serializados da operação
 }
-
-// Mensages de exceptions
-message FalhaNaConexaoException {
-    string message = 1;
-}
-
-message VendedorExistenteException {
-    string message = 1;
-}
-
-message DadosInvalidosException {
-    string message = 1;
-}
-
-message EmailInvalidoException {
-    string message = 1;
-}
-
-message CPFInvalidoException {
-    string message = 1;
-}
