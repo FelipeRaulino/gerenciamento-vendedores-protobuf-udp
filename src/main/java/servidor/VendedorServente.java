@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import exceptions.CPFInvalidoException;
 import exceptions.DadosInvalidosException;
 import exceptions.EmailInvalidoException;
+import exceptions.VendedorExistenteException;
 import exceptions.VendedorNaoEncontradoException;
 import proto.VendedorOuterClass.Vendedor;
 import proto.VendedorOuterClass.DesempenhoVendedorResponse;
@@ -36,17 +37,17 @@ public class VendedorServente {
 				throw new CPFInvalidoException("Por favor, forneça um cpf válido");
 			}
 			
-//			if (vendedorExistente(vendedor.getEmail())) {
-//				
-//			}
-			
+			if (vendedorExistente(vendedor.getEmail(), vendedor.getCpf())) {
+				throw new VendedorExistenteException("Já existe um vendedor com o email ou cpf informado!");
+			}
+
 			vendedores.add(vendedor);
 
 			return GenericResponse.newBuilder()
 					.setCodigo(200)
 					.setMensagem("Vendedor adicionado com sucesso!")
 					.build();
-		} catch (DadosInvalidosException | EmailInvalidoException | CPFInvalidoException e) {
+		} catch (DadosInvalidosException | EmailInvalidoException | CPFInvalidoException | VendedorExistenteException e) {
 			return empacotaErro(e);
 		}
 	}
@@ -149,8 +150,6 @@ public class VendedorServente {
 	public int quantidadeVendasPorAreaAtuacao(String areaAtuacao) {
 		int total = 0;
 		
-		System.out.println(areaAtuacao);
-		
 		for (Vendedor vendedor : vendedores) {
 			if (vendedor.getAreaAtuacao().equalsIgnoreCase(areaAtuacao)) {
 				total += vendedor.getVendas();
@@ -194,6 +193,16 @@ public class VendedorServente {
 					.setCodigo(400)
 					.setMensagem(e.getMessage())
 					.build();
+		} else if (e instanceof VendedorNaoEncontradoException) {
+			return GenericResponse.newBuilder()
+					.setCodigo(404)
+					.setMensagem(e.getMessage())
+					.build();
+		} else if (e instanceof VendedorExistenteException) {
+			return GenericResponse.newBuilder()
+					.setCodigo(409)
+					.setMensagem(e.getMessage())
+					.build();
 		} else if (e instanceof EmailInvalidoException) {
 			return GenericResponse.newBuilder()
 					.setCodigo(422)
@@ -204,12 +213,7 @@ public class VendedorServente {
 					.setCodigo(422)
 					.setMensagem(e.getMessage())
 					.build();
-		} else if (e instanceof VendedorNaoEncontradoException) {
-			return GenericResponse.newBuilder()
-					.setCodigo(404)
-					.setMensagem(e.getMessage())
-					.build();
-		}else {
+		} else {
 			return GenericResponse.newBuilder()
 					.setCodigo(500)
 					.setMensagem(e.getMessage())
@@ -273,9 +277,9 @@ public class VendedorServente {
         return (resto == 10 || resto == 11) ? 0 : resto;
     }
 	
-    private boolean vendedorExistenteByEmail(String email) {
+    private boolean vendedorExistente(String email, String cpf) {
     	for (Vendedor vendedor : vendedores) {
-			if (vendedor.getEmail() == email) {
+			if (vendedor.getEmail().equalsIgnoreCase(email) || vendedor.getCpf().equalsIgnoreCase(cpf)) {
 				return true;
 			}
 		}
@@ -292,6 +296,5 @@ public class VendedorServente {
     	
     	return null;
     }
-    
     
 }

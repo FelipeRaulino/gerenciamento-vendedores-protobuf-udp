@@ -3,7 +3,10 @@ package cliente;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
+
+import exceptions.FalhaNaConexaoException;
 
 public class UDPClient {
 
@@ -16,6 +19,7 @@ public class UDPClient {
 			socket = new DatagramSocket();
 			serverAddress = InetAddress.getByName(serverIP);
 			this.port = port;
+			socket.setSoTimeout(20000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -27,11 +31,21 @@ public class UDPClient {
 	}
 	
 	public byte[] getReply() throws Exception {
-	    byte[] buffer = new byte[1024];
-	    DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
-	    socket.receive(reply);
-	    
-	    return Arrays.copyOf(reply.getData(), reply.getLength());
+	    int attempts = 3; // Número de tentativas
+	    while (attempts > 0) {
+	        try {
+	            byte[] buffer = new byte[1024];
+	            DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
+	            socket.receive(reply);
+	            return Arrays.copyOf(reply.getData(), reply.getLength());
+	        } catch (SocketTimeoutException e) {
+	            attempts--;
+	            if (attempts == 0) {
+	                throw new FalhaNaConexaoException("Servidor não respondeu após várias tentativas.");
+	            }
+	        }
+	    }
+	    return null;
 	}
 	
 	public void finaliza() {

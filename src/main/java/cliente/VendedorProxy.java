@@ -9,6 +9,7 @@ import exceptions.CPFInvalidoException;
 import exceptions.DadosInvalidosException;
 import exceptions.EmailInvalidoException;
 import exceptions.FalhaNaConexaoException;
+import exceptions.VendedorExistenteException;
 import exceptions.VendedorNaoEncontradoException;
 import proto.VendedorOuterClass.Message;
 import proto.VendedorOuterClass.QuantidadeVendasAbsolutasArgs;
@@ -55,6 +56,9 @@ public class VendedorProxy {
 
 	            case 400:
 	                throw new DadosInvalidosException(response.getMensagem());
+	                
+	            case 409:
+	                throw new VendedorExistenteException(response.getMensagem());
 	            
 	            case 422:
 	            	if (response.getMensagem().contains("email")) {
