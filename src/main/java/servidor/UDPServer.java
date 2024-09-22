@@ -14,7 +14,7 @@ public class UDPServer {
         try {
             int serverPort = 7896;
             try (DatagramSocket socket = new DatagramSocket(serverPort)) {
-                socket.setSoTimeout(5000); // Configura o timeout para 5 segundos
+                socket.setSoTimeout(5000);
                 System.out.println("Servidor UDP rodando na porta " + serverPort);
                 
                 while (true) {
@@ -22,7 +22,7 @@ public class UDPServer {
                         byte[] buffer = new byte[1024];
                         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                         socket.receive(packet);
-                        Connection c = new Connection(socket, packet);
+                        new Connection(socket, packet);
                     } catch (IOException e) {
                         if (!e.getMessage().contains("timed out")) {
                         	System.out.println("Erro ao receber o pacote: " + e.getMessage());
@@ -34,6 +34,7 @@ public class UDPServer {
             e.printStackTrace();
         }
     }
+
 }
 
 class Connection extends Thread {
@@ -72,11 +73,11 @@ class Connection extends Thread {
         try {
             // Cria uma resposta genérica que inclui o resultado e o ID da requisição original
             Message response = Message.newBuilder()
-                .setType(2) // Indica que é uma resposta
-                .setId(requestId) // Associa com a requisição original
-                .setObfReference("VendedorServente") // Exemplo de referência ao serviço
-                .setMethodId("resposta") // Pode ser ajustado conforme necessário
-                .setArguments(com.google.protobuf.ByteString.copyFrom(resultado)) // Inclui o resultado
+                .setType(2)
+                .setId(requestId)
+                .setObfReference("VendedorServente")
+                .setMethodId("resposta")
+                .setArguments(com.google.protobuf.ByteString.copyFrom(resultado))
                 .build();
 
             // Serializa a resposta em bytes
@@ -89,19 +90,18 @@ class Connection extends Thread {
         }
     }
 
-    public void sendReply(byte[] resposta) {
+    public void sendReply(byte[] resposta) throws Exception {
         try {
-            System.out.println("Enviando resposta ao cliente...");
             DatagramPacket replyPacket = new DatagramPacket(resposta, resposta.length, packet.getAddress(), packet.getPort());
             socket.send(replyPacket);
-            System.out.println("Resposta enviada.");
         } catch (Exception e) {
-            System.out.println("Erro ao enviar resposta: " + e.getMessage());
+           throw new Exception(e.getMessage());
         }
     }
 
     public void run() {
         Message requisicao = desempacotaRequisicao(getRequest());
+        
         if (requisicao != null) {
             int requestId = requisicao.getId();
 
@@ -113,8 +113,15 @@ class Connection extends Thread {
 
             // Processa a nova requisição
             processedIds.add(requestId); // Adiciona o ID ao conjunto de IDs processados
+            
             byte[] resultado = despachante.selecionaEsqueleto(requisicao.toByteArray());
-            sendReply(empacotaResposta(resultado, requestId));
+            
+            try {
+				sendReply(empacotaResposta(resultado, requestId));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         } else {
             System.out.println("Requisição inválida recebida.");
         }

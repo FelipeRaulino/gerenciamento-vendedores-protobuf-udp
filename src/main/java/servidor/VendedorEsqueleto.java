@@ -10,7 +10,6 @@ import proto.VendedorOuterClass.DesempenhoVendedorResponse;
 import proto.VendedorOuterClass.EditarVendedorArgs;
 import proto.VendedorOuterClass.GenericResponse;
 import proto.VendedorOuterClass.ListarVendedoresResponse;
-import proto.VendedorOuterClass.QuantidadeVendasAbsolutasArgs;
 import proto.VendedorOuterClass.QuantidadeVendasAbsolutasResponse;
 import proto.VendedorOuterClass.QuantidadeVendasPorAreaAtuacaoArgs;
 import proto.VendedorOuterClass.QuantidadeVendasPorAreaAtuacaoResponse;

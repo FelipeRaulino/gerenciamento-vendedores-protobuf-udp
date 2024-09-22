@@ -9,6 +9,7 @@ import exceptions.CPFInvalidoException;
 import exceptions.DadosInvalidosException;
 import exceptions.EmailInvalidoException;
 import exceptions.FalhaNaConexaoException;
+import exceptions.TelefoneInvalidoException;
 import exceptions.VendedorExistenteException;
 import exceptions.VendedorNaoEncontradoException;
 import proto.VendedorOuterClass.Message;
@@ -55,7 +56,11 @@ public class VendedorProxy {
 	                return response.getMensagem();
 
 	            case 400:
-	                throw new DadosInvalidosException(response.getMensagem());
+	            	if (response.getMensagem().contains("telefone")) {
+	            		throw new TelefoneInvalidoException(response.getMensagem());	            		
+	            	} else {
+	            		throw new DadosInvalidosException(response.getMensagem());
+	            	}
 	                
 	            case 409:
 	                throw new VendedorExistenteException(response.getMensagem());
@@ -240,7 +245,7 @@ public class VendedorProxy {
 		}
 	}
 
-	private Message empacotaMensagem(String objectRef, String method, byte[] args) {
+	private Message empacotaMensagem(String objectRef, String method, byte[] args) {		
 		Message message = Message.newBuilder()
 				.setType(1)
 				.setId(requestId++)
@@ -248,6 +253,8 @@ public class VendedorProxy {
 				.setMethodId(method)
 				.setArguments(ByteString.copyFrom(args))
 				.build();
+		
+		System.out.println(requestId);
 		
 		return message;
 	}

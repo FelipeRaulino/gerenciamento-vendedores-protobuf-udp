@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import exceptions.CPFInvalidoException;
 import exceptions.DadosInvalidosException;
 import exceptions.EmailInvalidoException;
+import exceptions.TelefoneInvalidoException;
 import exceptions.VendedorExistenteException;
 import exceptions.VendedorNaoEncontradoException;
 import proto.VendedorOuterClass.Vendedor;
@@ -21,6 +22,8 @@ public class VendedorServente {
 	
 	private final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}";
 	
+	private final String TELEFONE_REGEX = "^\\d{11}$";
+	
 	//Métodos da aplicação
 
 	public GenericResponse adicionarVendedor(Vendedor vendedor) {
@@ -31,6 +34,10 @@ public class VendedorServente {
 			
 			if (!emailValido(vendedor.getEmail())) {
 				throw new EmailInvalidoException("Por favor, forneça um email válido");
+			}
+			
+			if (!telefoneValido(vendedor.getTelefone())) {
+				throw new TelefoneInvalidoException("Por favor, forneça um telefone válido");
 			}
 			
 			if (!validarCPF(vendedor.getCpf())) {
@@ -47,7 +54,7 @@ public class VendedorServente {
 					.setCodigo(200)
 					.setMensagem("Vendedor adicionado com sucesso!")
 					.build();
-		} catch (DadosInvalidosException | EmailInvalidoException | CPFInvalidoException | VendedorExistenteException e) {
+		} catch (DadosInvalidosException | EmailInvalidoException | CPFInvalidoException | VendedorExistenteException | TelefoneInvalidoException e) {
 			return empacotaErro(e);
 		}
 	}
@@ -186,9 +193,15 @@ public class VendedorServente {
 		    }
 	}
 	
+	
 	// Método para tratamento de erros
  	private GenericResponse empacotaErro(Exception e) {
 		if (e instanceof DadosInvalidosException) {
+			return GenericResponse.newBuilder()
+					.setCodigo(400)
+					.setMensagem(e.getMessage())
+					.build();
+		} else if (e instanceof TelefoneInvalidoException) {
 			return GenericResponse.newBuilder()
 					.setCodigo(400)
 					.setMensagem(e.getMessage())
@@ -238,6 +251,14 @@ public class VendedorServente {
 		Pattern pattern = Pattern.compile(EMAIL_REGEX);
 		
 		Matcher matcher = pattern.matcher(email);
+		
+		return matcher.matches();
+	}
+	
+	private boolean telefoneValido(String telefone) {
+		Pattern pattern = Pattern.compile(TELEFONE_REGEX);
+		
+		Matcher matcher = pattern.matcher(telefone);
 		
 		return matcher.matches();
 	}
