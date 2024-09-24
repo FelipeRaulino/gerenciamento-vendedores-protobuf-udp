@@ -4,9 +4,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import proto.VendedorOuterClass.Message;
+import utils.RequestKey;
 
 public class UDPServer {
 
@@ -21,7 +24,9 @@ public class UDPServer {
                     try {
                         byte[] buffer = new byte[1024];
                         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                        
                         socket.receive(packet);
+                        
                         new Connection(socket, packet);
                     } catch (IOException e) {
                         if (!e.getMessage().contains("timed out")) {
@@ -41,8 +46,9 @@ class Connection extends Thread {
     DatagramSocket socket;
     DatagramPacket packet;
     VendedorDespachante despachante;
-    static Set<Integer> processedIds = new HashSet<>(); // Set para armazenar IDs processados
-
+    static Set<RequestKey> processedRequests = new HashSet<>();
+    static Map<RequestKey, byte[]> responses = new HashMap<>();
+    
     public Connection(DatagramSocket socket, DatagramPacket packet) {
         this.socket = socket;
         this.packet = packet;
@@ -56,12 +62,10 @@ class Connection extends Thread {
 
     public Message desempacotaRequisicao(byte[] array) {
         try {
-            // Somente use os bytes relevantes
             int length = packet.getLength();
             byte[] relevantBytes = new byte[length];
             System.arraycopy(array, 0, relevantBytes, 0, length);
 
-            // Desempacota a mensagem usando apenas os bytes relevantes
             return Message.parseFrom(relevantBytes);
         } catch (Exception e) {
             System.out.println("Erro ao desempacotar a requisição: " + e.getMessage());
@@ -71,19 +75,19 @@ class Connection extends Thread {
 
     public byte[] empacotaResposta(byte[] resultado, int requestId) {
         try {
-            // Cria uma resposta genérica que inclui o resultado e o ID da requisição original
+        	
             Message response = Message.newBuilder()
                 .setType(2)
                 .setId(requestId)
-                .setObfReference("VendedorServente")
+                .setObfReference("VendedorService")
                 .setMethodId("resposta")
                 .setArguments(com.google.protobuf.ByteString.copyFrom(resultado))
                 .build();
 
-            // Serializa a resposta em bytes
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             response.writeTo(byteArrayOutputStream);
-            return byteArrayOutputStream.toByteArray(); // Retorna os bytes da resposta
+            
+            return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
             System.out.println("Erro ao empacotar a resposta: " + e.getMessage());
             return null;
@@ -93,6 +97,7 @@ class Connection extends Thread {
     public void sendReply(byte[] resposta) throws Exception {
         try {
             DatagramPacket replyPacket = new DatagramPacket(resposta, resposta.length, packet.getAddress(), packet.getPort());
+            
             socket.send(replyPacket);
         } catch (Exception e) {
            throw new Exception(e.getMessage());
@@ -104,22 +109,35 @@ class Connection extends Thread {
         
         if (requisicao != null) {
             int requestId = requisicao.getId();
+            String clientIP = packet.getAddress().getHostAddress();
+            int clientPort = packet.getPort();
+            
+            RequestKey key = new RequestKey(clientIP, clientPort, requestId);
 
-            // Verifica se o ID já foi processado
-            if (processedIds.contains(requestId)) {
-                System.out.println("Mensagem duplicada recebida com ID: " + requestId + ". Ignorando.");
-                return; // Ignora a mensagem
+            if (processedRequests.contains(key)) {
+                System.out.println("Mensagem duplicada recebida de " + clientIP + ":" + clientPort + " com ID: " + requestId + ". Ignorando.");
+                
+                byte[] respostaDuplicada = responses.get(key);
+                
+                if (respostaDuplicada != null) {
+                    try {
+                        sendReply(respostaDuplicada);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return;
             }
 
-            // Processa a nova requisição
-            processedIds.add(requestId); // Adiciona o ID ao conjunto de IDs processados
+            processedRequests.add(key);
             
             byte[] resultado = despachante.selecionaEsqueleto(requisicao.toByteArray());
+            
+            responses.put(key, resultado);
             
             try {
 				sendReply(empacotaResposta(resultado, requestId));
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         } else {
